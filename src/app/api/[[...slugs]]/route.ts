@@ -4,6 +4,7 @@ import email from "@/lib/models/mail";
 import sms from "@/lib/models/sms";
 import { Elysia, t } from "elysia";
 import { z } from "zod";
+import { cors } from '@elysiajs/cors'
 
 const sendmessage = new Elysia({ prefix: "/send" })
     .get("/whatsapp", async ({ query: { customId } }) => {
@@ -71,7 +72,13 @@ const sendmessage = new Elysia({ prefix: "/send" })
         }
     );
 
-const app = new Elysia({ prefix: "/api" })
+const app = new Elysia({ prefix: "/api" }).use(cors({
+    origin: process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000', // Configurable frontend URL
+    methods: ['GET', 'POST', 'OPTIONS'], // Specify allowed HTTP methods
+    allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
+    credentials: true, // Allow credentials (e.g., cookies, authorization headers)
+    maxAge: 86_400, // Cache the preflight response for 24 hours
+}),)
     .get("/", "Hello Nextjs")
     .post(
         "/",
